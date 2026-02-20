@@ -1,10 +1,11 @@
 interface MoodProfile {
   id: string;
-  label: string;           // Visningsnamn, t.ex. "Glad"
-  description: string;     // Kort beskrivning
-  genres: string[];        // Spotify-genrer att söka i
-  searchTerms: string[];   // Extra sökord
-  seedArtists?: string[];  // Valfria artist-IDs att söka runt
+  label: string;
+  description: string;
+  genres: string[];
+  excludeGenres?: string[];
+  searchTerms: string[];
+  seedArtists?: string[];
 }
 
 // Förenklad representation av en Spotify-låt

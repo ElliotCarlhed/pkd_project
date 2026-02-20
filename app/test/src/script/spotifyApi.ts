@@ -13,6 +13,20 @@ export async function createPlaylist(token: string, name: string, description: s
         }
         return response.json();
     }).then(data => {
-        return data.id;
+        return data.id; 
     });
+}
+
+export async function getTracks(moods: string, length: number, token: string){//mood type will be changed to moodProfiles
+    const response = await fetch(`https://api.spotify.com/v1/search?q=genre:${moods}&type=track&limit=${length}`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json'},
+    })
+
+    const data = await response.json()
+    console.log(data.tracks.items)
+    //TODO: combine include and exclude arrays
+    // get tracks from each genere add to array
+    // filter dont include
+    // shuffle array
 }

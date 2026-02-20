@@ -5,7 +5,7 @@ import {
   clearTokenData,
   getUserProfile,
 } from './script/auth';
-import { createPlaylist } from './script/spotifyApi';
+import { createPlaylist, getTracks } from './script/spotifyApi';
 
 type AuthState = 'idle' | 'loading' | 'authenticated' | 'error';
 
@@ -71,6 +71,10 @@ console.log('Token:', accessToken);
         console.error('Error creating playlist:', err);
       });
   };
+
+  const handleGetTrack = () => {
+    getTracks('pop', 1, accessToken!);
+  }
 
   return (
     <div className="app">
@@ -183,7 +187,7 @@ console.log('Token:', accessToken);
               <div className="token-display">{accessToken}</div>
             </div>
 
-            <button className="btn btn-logout" onClick={handleLogout}>Disconnect</button>
+            <button className="btn btn-logout" onClick={handleGetTrack}>Disconnect</button>
           </div>
         )}
       </main>
