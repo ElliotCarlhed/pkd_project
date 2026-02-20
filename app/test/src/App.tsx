@@ -6,6 +6,9 @@ import {
   getUserProfile,
 } from './script/auth';
 import { createPlaylist } from './script/spotifyApi';
+import { Route, Link } from 'wouter';
+import { PlaylistCreator } from './script/tinder-playlist';
+  
 
 type AuthState = 'idle' | 'loading' | 'authenticated' | 'error';
 
@@ -130,61 +133,73 @@ console.log('Token:', accessToken);
         )}
 
         {authState === 'authenticated' && profile && (
-          <div className="authenticated-view">
-            <div className="card profile-card">
-              <div className="profile-header">
-                {profile.images?.[0] ? (
-                  <img src={profile.images[0].url} alt={profile.display_name} className="avatar" />
-                ) : (
-                  <div className="avatar avatar-placeholder">
-                    {profile.display_name?.[0]?.toUpperCase()}
+          <>
+          <Route path="/callback">
+            <div className="authenticated-view">
+              <div className="card profile-card">
+                <div className="profile-header">
+                  {profile.images?.[0] ? (
+                    <img src={profile.images[0].url} alt={profile.display_name} className="avatar" />
+                  ) : (
+                    <div className="avatar avatar-placeholder">
+                      {profile.display_name?.[0]?.toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <div className="card-eyebrow">Authenticated as</div>
+                    <h2 className="profile-name">{profile.display_name}</h2>
+                    <div className="profile-email">{profile.email}</div>
                   </div>
-                )}
-                <div>
-                  <div className="card-eyebrow">Authenticated as</div>
-                  <h2 className="profile-name">{profile.display_name}</h2>
-                  <div className="profile-email">{profile.email}</div>
+                </div>
+                <div className="profile-meta">
+                  <div className="meta-item">
+                    <span className="meta-label">Country</span>
+                    <span className="meta-value">{profile.country}</span>
+                  </div>
+                  <div className="meta-item">
+                    <span className="meta-label">Plan</span>
+                    <span className="meta-value">{profile.product}</span>
+                  </div>
+                  <div className="meta-item">
+                    <span className="meta-label">Followers</span>
+                    <span className="meta-value">{profile.followers?.total?.toLocaleString()}</span>
+                  </div>
+                  <div className="meta-item">
+                    <span className="meta-label">User ID</span>
+                    <span className="meta-value mono">{profile.id}</span>
+                  </div>
                 </div>
               </div>
-              <div className="profile-meta">
-                <div className="meta-item">
-                  <span className="meta-label">Country</span>
-                  <span className="meta-value">{profile.country}</span>
-                </div>
-                <div className="meta-item">
-                  <span className="meta-label">Plan</span>
-                  <span className="meta-value">{profile.product}</span>
-                </div>
-                <div className="meta-item">
-                  <span className="meta-label">Followers</span>
-                  <span className="meta-value">{profile.followers?.total?.toLocaleString()}</span>
-                </div>
-                <div className="meta-item">
-                  <span className="meta-label">User ID</span>
-                  <span className="meta-value mono">{profile.id}</span>
-                </div>
+
+              <div>
+                <button className="btn btn-copy" onClick={handleCreatePlaylist}>Create Empty Playlist</button>
               </div>
-            </div>
+              <div>
+                <Link href="/playlist-creator">
+                  <a className="btn btn-secondary">Create Playlist</a>
+                </Link>
 
-            <div>
-              <button className="btn btn-copy" onClick={handleCreatePlaylist}>Create Playlist</button>
-            </div>
-
-            <div className="card token-card">
-              <div className="token-header">
-                <div>
-                  <div className="card-eyebrow">Access Token</div>
-                  <p className="token-hint">Use this to make Spotify API requests</p>
-                </div>
-                <button className="btn btn-copy" onClick={handleCreatePlaylist}>
-                  
-                </button>
               </div>
-              <div className="token-display">{accessToken}</div>
-            </div>
 
-            <button className="btn btn-logout" onClick={handleLogout}>Disconnect</button>
-          </div>
+              <div className="card token-card">
+                <div className="token-header">
+                  <div>
+                    <div className="card-eyebrow">Access Token</div>
+                    <p className="token-hint">Use this to make Spotify API requests</p>
+                  </div>
+                  <button className="btn btn-copy" onClick={handleCreatePlaylist}>
+                    
+                  </button>
+                </div>
+                <div className="token-display">{accessToken}</div>
+              </div>
+
+              <button className="btn btn-logout" onClick={handleLogout}>Disconnect</button>
+            </div>
+          </Route>
+
+          <Route path="/playlist-creator" component={PlaylistCreator} />
+          </>
         )}
       </main>
     </div>
