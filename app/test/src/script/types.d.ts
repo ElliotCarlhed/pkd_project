@@ -13,7 +13,7 @@ interface Track {
   id: string;
   name: string;
   artists: Artist[];
-  album: Album;
+  album: string;
   previewUrl: string | null;
   externalUrl: string;       // Länk till Spotify
   durationMs: number;
@@ -60,4 +60,8 @@ interface UserProfile {
   country: string;
   product: string;
   id: string;
+}
+interface TokenData {
+  accessToken: string;       // Nyckeln som ger oss tillgång till API:t
+  expiresAt: number;         // Tidsstämpel (ms) för när accessToken slutar gälla
 }

@@ -5,7 +5,7 @@ import {
   clearTokenData,
   getUserProfile,
 } from './script/auth';
-import { createPlaylist, getTracks } from './script/spotifyApi';
+import { createPlaylist, getTracks, main } from './script/spotifyApi';
 
 type AuthState = 'idle' | 'loading' | 'authenticated' | 'error';
 
@@ -73,7 +73,12 @@ console.log('Token:', accessToken);
   };
 
   const handleGetTrack = () => {
-    getTracks('pop', 1, accessToken!);
+    const generes: Set<string> = new Set('pop');
+    getTracks(generes, 1, accessToken!);
+  }
+
+  const handleLargerTest = () => {
+    main(['hiphop', 'rainy'], 10, accessToken!);
   }
 
   return (
@@ -172,6 +177,9 @@ console.log('Token:', accessToken);
 
             <div>
               <button className="btn btn-copy" onClick={handleCreatePlaylist}>Create Playlist</button>
+            </div>
+            <div>
+              <button className="btn btn-copy" onClick={handleLargerTest}>test</button>
             </div>
 
             <div className="card token-card">

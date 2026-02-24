@@ -21,15 +21,6 @@ const scope = 'user-read-private user-read-email user-top-read playlist-modify-p
 // TOKEN-TYPER
 // ============================================================
 
-/**
- * Representerar all token-data vi får från Spotify.
- * Detta är en "komplex datatyp" — ett objekt med flera fält av olika typer.
- */
-export interface TokenData {
-  accessToken: string;       // Nyckeln som ger oss tillgång till API:t
-  expiresAt: number;         // Tidsstämpel (ms) för när accessToken slutar gälla
-}
-
 // ============================================================
 // TOKEN-LAGRING (localStorage)
 // ============================================================
