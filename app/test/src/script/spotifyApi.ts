@@ -22,8 +22,10 @@ export async function createPlaylist(token: string, name: string, description: s
 
 export async function getTracks(genres: Set<string>, length: number, token: string) {
     const lengthPer = Math.floor(length / genres.size);
+    let remainder = length % genres.size;
     await Promise.all([...genres].map(async (element) => {
-        const response = await fetch(`https://api.spotify.com/v1/search?q=genre:${element}&type=track&limit=${lengthPer}`, {
+        const currentLength = lengthPer + (remainder-- > 0 ? 1 : 0);
+        const response = await fetch(`https://api.spotify.com/v1/search?q=genre:${element}&type=track&limit=${currentLength}`, {
             method: 'GET',
             headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         });
@@ -33,6 +35,7 @@ export async function getTracks(genres: Set<string>, length: number, token: stri
         const data = await response.json();
         saveTrackData(data.tracks.items.map((track: any) => simplefieGetTrack(track)));
     }));
+    console.log('Tracks fetched and saved to localStorage');
 };
 
 function simplefieGetTrack(track: any): Track {
@@ -44,7 +47,8 @@ function simplefieGetTrack(track: any): Track {
         previewUrl: track.preview_url,
         externalUrl: track.external_urls.spotify,
         durationMs: track.duration_ms,
-        imageUrl: track.album.images[0]?.url || ''
+        imageUrl: track.album.images[0]?.url || '',
+        uri: track.uri,
     }
 };
 
@@ -68,7 +72,7 @@ const clearTrackData = (): void => {
   localStorage.removeItem(storedData.track);
 };
 
-const getStoredTrack = (): any | null => {
+export const getStoredTrack = (): any | null => {
   const trackData = localStorage.getItem(storedData.track);
   if (trackData) {
     return JSON.parse(trackData);
@@ -76,7 +80,7 @@ const getStoredTrack = (): any | null => {
   return null;
 };
 
-const getStoredPlaylist = (): string | null => {
+export const getStoredPlaylist = (): string | null => {
     const playlistData = localStorage.getItem(storedData.playlist);
     if (playlistData) { 
         return JSON.parse(playlistData).id;
@@ -85,8 +89,8 @@ const getStoredPlaylist = (): string | null => {
 };
 
 
-function addTracksToPlaylist(playlistId: string, trackUris: string[], token: string): Promise<string> {
-    return fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+export async function addTracksToPlaylist(playlistId: string, trackUris: string[], token: string): Promise<string> {
+    return fetch(`https://api.spotify.com/v1/playlists/${playlistId}/items`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ uris: trackUris })
@@ -96,6 +100,7 @@ function addTracksToPlaylist(playlistId: string, trackUris: string[], token: str
         }
         return response.json();
     });
+    
 };
 
 

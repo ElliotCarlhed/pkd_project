@@ -18,6 +18,7 @@ interface Track {
   externalUrl: string;       // Länk till Spotify
   durationMs: number;
   imageUrl: string;
+  uri: string;               // Spotify URI, används för att lägga till i spellista
 }
 
 interface Artist {

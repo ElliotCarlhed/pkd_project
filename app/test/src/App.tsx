@@ -5,7 +5,8 @@ import {
   clearTokenData,
   getUserProfile,
 } from './script/auth';
-import { createPlaylist, getTracks, main } from './script/spotifyApi';
+import { createPlaylist, getTracks, main, addTracksToPlaylist, getStoredTrack, getStoredPlaylist } from './script/spotifyApi';
+
 
 type AuthState = 'idle' | 'loading' | 'authenticated' | 'error';
 
@@ -78,8 +79,14 @@ console.log('Token:', accessToken);
   }
 
   const handleLargerTest = () => {
-    main(['hiphop', 'rainy'], 10, accessToken!);
+    main(['max'], 10, accessToken!);
   }
+  const saveTrack = () => {
+    const tracks = getStoredTrack().map((track: Track) => track.uri);
+    const playlistId = getStoredPlaylist();
+    addTracksToPlaylist(playlistId!, tracks, accessToken!)
+    console.log('Tracks added to playlist');
+    }
 
   return (
     <div className="app">
@@ -179,7 +186,10 @@ console.log('Token:', accessToken);
               <button className="btn btn-copy" onClick={handleCreatePlaylist}>Create Playlist</button>
             </div>
             <div>
-              <button className="btn btn-copy" onClick={handleLargerTest}>test</button>
+              <button className="btn btn-copy" onClick={handleLargerTest}>Get tracks</button>
+            </div>
+            <div>
+              <button className="btn btn-copy" onClick={saveTrack}>Save track</button>
             </div>
 
             <div className="card token-card">

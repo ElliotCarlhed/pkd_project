@@ -163,6 +163,13 @@ export const moods: MoodProfile[] = [
     excludeGenres: ["edm", "electronic", "metal"],
     searchTerms: ["acoustic", "unplugged", "raw", "folk"],
   },
+  {
+    id: "max",
+    label: "Lång man med skägg",
+    description: "Lång man med skägg",
+    genres: ["death metal", "black metal", "doom metal", "deathcore", "grindcore"],
+    searchTerms: ["max", "everything", "all genres"],
+  }
 ];
 
 // Helper: look up a mood by its id
