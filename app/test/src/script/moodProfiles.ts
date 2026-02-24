@@ -177,18 +177,4 @@ export function getMoodById(id: string): MoodProfile | undefined {
   return moods.find((m) => m.id === id);
 }
 
-// Helper: combine genres and search terms from multiple selected moods
-export function buildSearchConfig(selectedMoods: MoodProfile[]): {
-  genres: string[];
-  searchTerms: string[];
-  excludeGenres: string[];
-} {
-  const genres = [...new Set(selectedMoods.flatMap((m) => m.genres))];
-  const searchTerms = [...new Set(selectedMoods.flatMap((m) => m.searchTerms))];
-  const excludeGenres = [...new Set(selectedMoods.flatMap((m) => m.excludeGenres ?? []))];
 
-  // Remove any excluded genre that another selected mood explicitly includes
-  const filteredExclusions = excludeGenres.filter((ex) => !genres.includes(ex));
-
-  return { genres, searchTerms, excludeGenres: filteredExclusions };
-}
