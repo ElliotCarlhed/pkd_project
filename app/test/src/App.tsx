@@ -64,7 +64,7 @@ console.log('Token:', accessToken);
   };
 
   const handleCreatePlaylist = () => {
-    createPlaylist(accessToken!, 'api', 'A playlist created via the Spotify API', true)
+    createPlaylist(accessToken!, 'lulle4', 'A playlist created via the Spotify API', true)
       .then((playlist) => {
         console.log('Playlist created:', playlist);
       })
@@ -79,7 +79,7 @@ console.log('Token:', accessToken);
   }
 
   const handleLargerTest = () => {
-    main(['max'], 10, accessToken!);
+    main(['luleå4'], 40, accessToken!);
   }
   const saveTrack = () => {
     const tracks = getStoredTrack().map((track: Track) => track.uri);

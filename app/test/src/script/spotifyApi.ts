@@ -13,10 +13,10 @@ import { getMoodById } from "./moodProfiles";
  * @precondition token is a valid, non-expired Spotify OAuth token.
  * @sideeffect Saves the full playlist response to localStorage.
  * @throws Error if the Spotify API responds with a non-OK status.
- * @return {Promise<void>} Resolves when the playlist is created and data is saved.
+ * @return {Promise<string>} Resolves when the playlist is created and data is saved.
  */
-export async function createPlaylist(token: string, name: string, description: string, isPublic: boolean): Promise<void> {
-    fetch('https://api.spotify.com/v1/me/playlists', {
+export async function createPlaylist(token: string, name: string, description: string, isPublic: boolean): Promise<string> {
+    return fetch('https://api.spotify.com/v1/me/playlists', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -28,8 +28,11 @@ export async function createPlaylist(token: string, name: string, description: s
         if (!response.ok) {
             throw new Error(`Failed to create playlist: ${response.status}`);
         }
-    }).then(data => {
+        return response;
+    }).then(async response => {
+        const data = await response.json();
         savePlaylistData(data);
+        return data.id;
     });
 };
 
@@ -102,7 +105,7 @@ const storedData = {
 
 // Saves the playlist id to localStorage.
 const savePlaylistData = (data: any): void => {
-  localStorage.setItem(storedData.playlist, JSON.stringify(data.id));
+  localStorage.setItem(storedData.playlist, JSON.stringify(data));
 };
 
  // Appends an array of track data to the existing track array in localStorage.
@@ -132,7 +135,7 @@ export const getStoredTrack = (): any | null => {
 export const getStoredPlaylist = (): string | null => {
     const playlistData = localStorage.getItem(storedData.playlist);
     if (playlistData) { 
-        return JSON.parse(playlistData);
+        return JSON.parse(playlistData).id;
     }
     return null;
 };
