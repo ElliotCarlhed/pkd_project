@@ -197,6 +197,20 @@ export const moods: MoodProfile[] = [
     description: "öl och skägg",
     genres: ["Nu Disco", "Abstractro", "Quebecois", "Garage Punk Blues", "German Show Tunes", "Deep Ccm", "Steelpan", "Martial Industrial"],
     searchTerms: [],
+  },
+  {
+    id: "random1",
+    label: "Random 1",
+    description: "Random mood profile",
+    genres: ["Fake", "Ragga Jungle", "Martial Industrial", "Yugoslav Rock", "Nintendocore", "Russian Punk"],
+    searchTerms: [],
+  },
+  {
+    id: "kindatoorandom",
+    label: "Random 1",
+    description: "Random mood profile",
+    genres: ["Oshare Kei"],
+    searchTerms: [],
   }
 ];
 

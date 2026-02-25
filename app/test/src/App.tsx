@@ -5,7 +5,7 @@ import {
   clearTokenData,
   getUserProfile,
 } from './script/auth';
-import { createPlaylist, getTracks, main, addTracksToPlaylist, getStoredTrack, getStoredPlaylist } from './script/spotifyApi';
+import { createPlaylist, getTracks, main, addTracksToPlaylist, getStoredTrack, getStoredPlaylist, funny } from './script/spotifyApi';
 
 
 type AuthState = 'idle' | 'loading' | 'authenticated' | 'error';
@@ -64,7 +64,7 @@ console.log('Token:', accessToken);
   };
 
   const handleCreatePlaylist = () => {
-    createPlaylist(accessToken!, 'lulle4', 'A playlist created via the Spotify API', true)
+    createPlaylist(accessToken!, 'Samirs Lista5 <3', 'A playlist created via the Spotify API', true)
       .then((playlist) => {
         console.log('Playlist created:', playlist);
       })
@@ -79,8 +79,13 @@ console.log('Token:', accessToken);
   }
 
   const handleLargerTest = () => {
-    main(['luleå4'], 40, accessToken!);
+    main(['kindatoorandom'], 40, accessToken!);
   }
+
+  const funnyTest = () => {
+    funny(accessToken!);
+  }
+  
   const saveTrack = () => {
     const tracks = getStoredTrack().map((track: Track) => track.uri);
     const playlistId = getStoredPlaylist();
@@ -190,6 +195,9 @@ console.log('Token:', accessToken);
             </div>
             <div>
               <button className="btn btn-copy" onClick={saveTrack}>Save track</button>
+            </div>
+            <div>
+              <button className="btn btn-copy" onClick={funnyTest}>Random genres</button>
             </div>
 
             <div className="card token-card">

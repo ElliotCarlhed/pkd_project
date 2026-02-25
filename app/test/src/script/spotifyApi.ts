@@ -1,5 +1,6 @@
 import { getMoodById } from "./moodProfiles";
-
+import { genresAll } from "./genresArray";
+import { stringify } from "querystring";
 
 /**
  * Creates a new Spotify playlist for the authenticated user.
@@ -230,4 +231,37 @@ export async function main(inputMoods: Array<string>, inputLength: number, token
 }
 
 
+export async function funny(token: string): Promise<void> {
+    let mood = {
+        id: "random1",
+        label: "Random 1",
+        description: "Random mood profile",
+        genres: [] as string[],
+    }
+    for (let i = 0; i <= 16; i++) {
+        mood.genres.push(genresAll[Math.floor(Math.random() * genresAll.length)]);
+    }
+    const genreSet = new Set(mood.genres);
+    clearTrackData();
+    await getTracks(genreSet, 50, token);
+    console.log('Random genres:', mood.genres);
+    //Todo: filter out excluded genres
+    shuffleTracks();
+    const playlistDescription = '' + mood.genres.join(', ');
+    await createPlaylist(token, ('Random Playlist ' + Math.floor(Math.random()*1000)), playlistDescription, true)
+        .then((playlistId) => {
+            console.log('Playlist created with ID:', playlistId);})
+        .catch((err) => {
+            console.error('Error creating playlist:', err);
+        });
+    const playlistId = await getStoredPlaylist();
+    const tracks = await getStoredTrack().map((track: Track) => track.uri);
+    if (playlistId) {
+        addTracksToPlaylist(playlistId, tracks, token);
+        console.log('Tracks added to playlist:', tracks);
+    } else {
+        console.error('No stored playlist ID found');
+    }
+
     
+}
