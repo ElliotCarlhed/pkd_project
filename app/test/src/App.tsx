@@ -78,7 +78,7 @@ console.log('Token:', accessToken);
 
   const handleGetTrack = () => {
     const generes: Set<string> = new Set('pop');
-    getTracks(generes, 1, accessToken!);
+    getTracks(generes, 20, accessToken!);
   }
 
   const handleLargerTest = () => {
@@ -197,7 +197,14 @@ console.log('Token:', accessToken);
               </div>
               <div>
                 <Link href="/playlist-creator">
-                  <a className="btn btn-secondary">Create Playlist</a>
+                  <a className="btn btn-secondary"
+                  onClick={() => {
+                    handleCreatePlaylist();
+                    handleGetTrack();
+                  }}
+                  > 
+                    Create Playlist
+                  </a>
                 </Link>
 
               </div>

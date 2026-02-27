@@ -13,7 +13,7 @@ interface Track {
   id: string;
   name: string;
   artists: Artist[];
-  album: string;
+  album: Album;
   previewUrl: string | null;
   externalUrl: string;       // Länk till Spotify
   durationMs: number;

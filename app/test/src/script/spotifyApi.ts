@@ -110,7 +110,7 @@ const savePlaylistData = (data: any): void => {
 
  // Appends an array of track data to the existing track array in localStorage.
  // If no existing data is found, starts a new array.
-const saveTrackData = (data: any): void => {
+export const saveTrackData = (data: any): void => {
     const existingData = getStoredTrack() || [];
     const combinedData = existingData.concat(data);
     localStorage.setItem(storedData.track, JSON.stringify(combinedData));
@@ -118,7 +118,7 @@ const saveTrackData = (data: any): void => {
 
 
 // Clears the stored track data from localStorage.
-const clearTrackData = (): void => {
+export const clearTrackData = (): void => {
   localStorage.removeItem(storedData.track);
 };
 

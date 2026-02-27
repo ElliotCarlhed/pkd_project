@@ -2,7 +2,7 @@ import { Link } from 'wouter';
 import TinderCard from 'react-tinder-card';
 import { useState } from 'react';
 import type { SVGProps } from 'react';
-
+import {saveTrackData, clearTrackData, getStoredTrack} from './spotifyApi'
 
 // SVG's 
 const RightArrowSVG = (props: SVGProps<SVGSVGElement>) => (
@@ -36,6 +36,7 @@ const songs: Array<Track> = [
     durationMs: 210000,
     imageUrl:
       'https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228',
+    uri: 'hej'
   },
   {
     id: '2',
@@ -53,6 +54,7 @@ const songs: Array<Track> = [
     durationMs: 210000,
     imageUrl:
       'https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228',
+      uri: 'hej'
   },
   {
     id: '3',
@@ -70,11 +72,12 @@ const songs: Array<Track> = [
     durationMs: 210000,
     imageUrl:
       'https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228',
+      uri: 'hej'
   },
 ];
 
 export function PlaylistCreator() {
-  const [Tracks, setTracks] = useState<Array<Track>>(songs);
+  const [Tracks, setTracks] = useState<Array<Track>>(getStoredTrack);
   const [LikedTracks, setLikedTracks] = useState<Array<Track>>([]);
   const [DislikedTracks, setDislikedTracks] = useState<Array<Track>>([]);
   const [deckFinished, setDeckFinished] = useState<boolean>(false);
