@@ -1,10 +1,11 @@
 interface MoodProfile {
   id: string;
-  label: string;           // Visningsnamn, t.ex. "Glad"
-  description: string;     // Kort beskrivning
-  genres: string[];        // Spotify-genrer att söka i
-  searchTerms: string[];   // Extra sökord
-  seedArtists?: string[];  // Valfria artist-IDs att söka runt
+  label: string;
+  description: string;
+  genres: string[];
+  excludeGenres?: string[];
+  searchTerms: string[];
+  seedArtists?: string[];
 }
 
 // Förenklad representation av en Spotify-låt
@@ -12,11 +13,12 @@ interface Track {
   id: string;
   name: string;
   artists: Artist[];
-  album: Album;
+  album: string;
   previewUrl: string | null;
   externalUrl: string;       // Länk till Spotify
   durationMs: number;
   imageUrl: string;
+  uri: string;               // Spotify URI, används för att lägga till i spellista
 }
 
 interface Artist {
@@ -59,4 +61,8 @@ interface UserProfile {
   country: string;
   product: string;
   id: string;
+}
+interface TokenData {
+  accessToken: string;       // Nyckeln som ger oss tillgång till API:t
+  expiresAt: number;         // Tidsstämpel (ms) för när accessToken slutar gälla
 }

@@ -5,10 +5,11 @@ import {
   clearTokenData,
   getUserProfile,
 } from './script/auth';
-import { createPlaylist } from './script/spotifyApi';
+import { createPlaylist, getTracks, main, addTracksToPlaylist, getStoredTrack, getStoredPlaylist, funny } from './script/spotifyApi';
 import { Route, Link } from 'wouter';
 import { PlaylistCreator } from './script/tinder-playlist';
   
+
 
 type AuthState = 'idle' | 'loading' | 'authenticated' | 'error';
 
@@ -66,7 +67,7 @@ console.log('Token:', accessToken);
   };
 
   const handleCreatePlaylist = () => {
-    createPlaylist(accessToken!, 'api', 'A playlist created via the Spotify API', true)
+    createPlaylist(accessToken!, 'Samirs Lista5 <3', 'A playlist created via the Spotify API', true)
       .then((playlist) => {
         console.log('Playlist created:', playlist);
       })
@@ -74,6 +75,26 @@ console.log('Token:', accessToken);
         console.error('Error creating playlist:', err);
       });
   };
+
+  const handleGetTrack = () => {
+    const generes: Set<string> = new Set('pop');
+    getTracks(generes, 1, accessToken!);
+  }
+
+  const handleLargerTest = () => {
+    main(['kindatoorandom'], 40, accessToken!);
+  }
+
+  const funnyTest = () => {
+    funny(accessToken!);
+  }
+  
+  const saveTrack = () => {
+    const tracks = getStoredTrack().map((track: Track) => track.uri);
+    const playlistId = getStoredPlaylist();
+    addTracksToPlaylist(playlistId!, tracks, accessToken!)
+    console.log('Tracks added to playlist');
+    }
 
   return (
     <div className="app">
