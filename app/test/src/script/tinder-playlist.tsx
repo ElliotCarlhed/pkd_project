@@ -30,7 +30,9 @@ const songs: Array<Track> = [
       releaseDate: '2020-01-01',
     },
     previewUrl: null,
-    externalUrl: 'https://open.spotify.com/track/1',
+    externalUrl: 'https://open.spotify.com/track/1', 
+    // Check how API returns track URL
+    // Use regEx to transform to desired format. 
     durationMs: 210000,
     imageUrl:
       'https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228',
