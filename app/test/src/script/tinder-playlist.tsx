@@ -2,7 +2,7 @@ import { Link } from 'wouter';
 import TinderCard from 'react-tinder-card';
 import { useState } from 'react';
 import type { SVGProps } from 'react';
-import {saveTrackData, clearTrackData, getStoredTrack} from './spotifyApi'
+import {saveTrackData, clearTrackData, getStoredTrack, createPlaylist} from './spotifyApi'
 
 // SVG's 
 const RightArrowSVG = (props: SVGProps<SVGSVGElement>) => (
@@ -16,6 +16,11 @@ const LeftArrowSVG = (props: SVGProps<SVGSVGElement>) => (
   <path d="M4 12L10 6M4 12L10 18M4 12H14.5M20 12H17.5" stroke="#74343d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
 )
+
+interface PlaylistCreatorProps {
+  accessToken: string | null; // token from parent
+  // add any additional state props here
+}
 
 const songs: Array<Track> = [
   {
@@ -76,11 +81,12 @@ const songs: Array<Track> = [
   },
 ];
 
-export function PlaylistCreator() {
+export function PlaylistCreator({ accessToken }: PlaylistCreatorProps) {
   const [Tracks, setTracks] = useState<Array<Track>>(getStoredTrack);
   const [LikedTracks, setLikedTracks] = useState<Array<Track>>([]);
   const [DislikedTracks, setDislikedTracks] = useState<Array<Track>>([]);
   const [deckFinished, setDeckFinished] = useState<boolean>(false);
+  const [savingPlaylist, setSavingPlaylist] = useState<boolean>(false);
 
   const onSwipe = (
     direction: string,
@@ -111,6 +117,21 @@ export function PlaylistCreator() {
     console.log(`${trackName} left the screen`);
   };
 
+  const handleGeneratePlaylist = (token: string, name: string, description: string, isPublic: boolean) => {
+    clearTrackData();
+    saveTrackData(LikedTracks);
+    createPlaylist(
+      token, 
+      name, 
+      description,
+      isPublic)
+    .then((playlist) => {
+      console.log('Playlist created:', playlist);
+    })
+    .catch((err) => {
+      console.error('Error creating playlist:', err);
+    });
+  }
 
   if (deckFinished) {
     return (
@@ -123,9 +144,49 @@ export function PlaylistCreator() {
           gap: '20px',
         }}
       >
-        <h1>Deck Finished</h1>
-        <p>Liked tracks: {LikedTracks.length}</p>
-        <p>Disliked tracks: {DislikedTracks.length}</p>
+
+        {!savingPlaylist && (
+          <>
+            <h1>Deck Finished</h1>
+            <p>Liked tracks: {LikedTracks.length}</p>
+            <p>Disliked tracks: {DislikedTracks.length}</p>
+          </>
+        )}
+
+        {savingPlaylist && (
+          <>
+            <h1>Playlist name:</h1>  
+            <input 
+              type="text" 
+              placeholder='Enter name of playlist' 
+              style={{
+                padding: '10px',
+                fontSize: '16px',
+                width: '300px',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+                alignItems: 'center',
+                textAlign: 'center'
+              }} />
+          </>
+        )}
+
+        <button 
+          className='btn btn-secondary' 
+          style={{backgroundColor: '#2a8036'}} 
+          onClick={() => {
+            if (!savingPlaylist) {
+              setSavingPlaylist(true);
+            } else {
+              handleGeneratePlaylist(
+                accessToken!, 
+                (document.querySelector('input') as HTMLInputElement)?.value || 'My Tinder Playlist', 
+                'A playlist generated from the Tinder-like interface', 
+                true);
+            }
+          }}>
+          {savingPlaylist ? 'Create Playlist' : 'Save Playlist'}
+        </button>
 
         <Link href="/callback">
           <a className="btn btn-secondary">Back to Home</a>

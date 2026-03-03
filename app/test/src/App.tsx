@@ -67,7 +67,7 @@ console.log('Token:', accessToken);
   };
 
   const handleCreatePlaylist = () => {
-    createPlaylist(accessToken!, 'Samirs Lista5 <3', 'A playlist created via the Spotify API', true)
+    createPlaylist(accessToken!, 'My New Playlist', 'A playlist created via the Spotify API', true)
       .then((playlist) => {
         console.log('Playlist created:', playlist);
       })
@@ -199,7 +199,7 @@ console.log('Token:', accessToken);
                 <Link href="/playlist-creator">
                   <a className="btn btn-secondary"
                   onClick={() => {
-                    handleCreatePlaylist();
+                    // handleCreatePlaylist();
                     handleGetTrack();
                   }}
                   > 
@@ -226,7 +226,11 @@ console.log('Token:', accessToken);
             </div>
           </Route>
 
-          <Route path="/playlist-creator" component={PlaylistCreator} />
+          <Route path="/playlist-creator">
+            <PlaylistCreator
+              accessToken={accessToken!} 
+            />
+          </Route>
           </>
         )}
       </main>
