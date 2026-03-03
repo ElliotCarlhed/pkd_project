@@ -2,7 +2,7 @@ import { Link } from 'wouter';
 import TinderCard from 'react-tinder-card';
 import { useState } from 'react';
 import type { SVGProps } from 'react';
-import {saveTrackData, clearTrackData, getStoredTrack, createPlaylist} from './spotifyApi'
+import {saveTrackData, clearTrackData, getStoredTrack, createPlaylist, createPlaylistAddTracks} from './spotifyApi'
 
 // SVG's 
 const RightArrowSVG = (props: SVGProps<SVGSVGElement>) => (
@@ -120,17 +120,12 @@ export function PlaylistCreator({ accessToken }: PlaylistCreatorProps) {
   const handleGeneratePlaylist = (token: string, name: string, description: string, isPublic: boolean) => {
     clearTrackData();
     saveTrackData(LikedTracks);
-    createPlaylist(
-      token, 
-      name, 
+    createPlaylistAddTracks(
+      token,
+      name,
       description,
-      isPublic)
-    .then((playlist) => {
-      console.log('Playlist created:', playlist);
-    })
-    .catch((err) => {
-      console.error('Error creating playlist:', err);
-    });
+      isPublic
+    )
   }
 
   if (deckFinished) {

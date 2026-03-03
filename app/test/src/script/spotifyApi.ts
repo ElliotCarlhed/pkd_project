@@ -165,6 +165,33 @@ export async function addTracksToPlaylist(playlistId: string, trackUris: string[
     
 };
 
+export async function createPlaylistAddTracks(
+    token : string, 
+    playlistName : string,
+    description: string, 
+    isPublic: boolean
+) {
+    await createPlaylist(
+        token, 
+        playlistName,
+        description,
+        isPublic
+    )
+    .then((playlist) => {
+      console.log('Playlist created:', playlist);
+    })
+    .catch((err) => {
+      console.error('Error creating playlist:', err);
+    });
+    const playlistId = getStoredPlaylist();
+    const trackURIs = await getStoredTrack().map((track: Track) => track.uri);
+    if (playlistId) {
+        addTracksToPlaylist(playlistId, trackURIs, token);
+        console.log('Tracks added to playlist:', trackURIs);
+    } else {
+        console.error('No stored playlist ID found');
+    }
+}
 
 /**
  * Extracts and deduplicates all genre strings from an array of MoodProfile objects.
