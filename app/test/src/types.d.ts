@@ -1,3 +1,11 @@
+
+interface Window {
+  onSpotifyWebPlaybackSDKReady?: () => void;
+  Spotify?: any; 
+}
+
+
+
 interface MoodProfile {
   id: string;
   label: string;
@@ -27,10 +35,8 @@ interface Artist {
 }
 
 interface Album {
-  id: string;
   name: string;
   imageUrl: string;
-  releaseDate: string;
 }
 
 // Swipe-session: håller koll på pågående session
@@ -65,4 +71,23 @@ interface UserProfile {
 interface TokenData {
   accessToken: string;       // Nyckeln som ger oss tillgång till API:t
   expiresAt: number;         // Tidsstämpel (ms) för när accessToken slutar gälla
+}
+
+interface SpotifyRawTrack {
+    id: string;
+    name: string;
+    artists: Array<{
+        id: string;
+        name: string;
+    }>;
+    album: {
+        name: string;
+        images: Array<{ url: string }>;
+    };
+    preview_url: string | null;
+    external_urls: {
+        spotify: string;
+    };
+    duration_ms: number;
+    uri: string;
 }

@@ -1,7 +1,3 @@
-// moodProfiles.ts
-// Central mood configuration for the Spotify Playlist Builder.
-// Each MoodProfile maps a user-facing tag to genres and search terms,
-// and optionally excludes genres that would clash with the mood.
 
 
 

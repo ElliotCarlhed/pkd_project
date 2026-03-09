@@ -1,5 +1,3 @@
-import { getMoodById } from "./moodProfiles";
-import { genresAll } from "./genresArray";
 
 /**
  * Creates a new Spotify playlist for the authenticated user.
@@ -54,22 +52,34 @@ export async function createPlaylist(token: string, name: string, description: s
  * @complexity O(n) API calls where n is the number of genres, executed concurrently.
  * @returns {Promise<void>}
  */
-export async function getTracks(genres: Set<string>, length: number, token: string): Promise<void> {
+export async function getTracks(moods: Array<MoodProfile>, length: number, token: string): Promise<void> {
+    const genres = moodsToGenres(moods);
     const lengthPer = Math.floor(length / genres.size);
     let remainder = length % genres.size;
+
+    console.log(`Fetching a total of ${length} tracks across ${genres.size} genres:`, genres);
+
     await Promise.all([...genres].map(async (element) => {
+        console.log(`Fetching ${lengthPer + (remainder > 0 ? 1 : 0)} tracks for genre: ${element}`);
         const currentLength = lengthPer + (remainder-- > 0 ? 1 : 0);
-        const response = await fetch(`https://api.spotify.com/v1/search?q=genre:${element}&type=track&limit=${currentLength}`, {
+        const query = encodeURIComponent(`genre:${element}`);
+        console.log(`Constructed query for genre "${element}": ${query}`);
+        const response = await fetch(`https://api.spotify.com/v1/search?q=${query}&type=track&limit=${currentLength}`, {
             method: 'GET',
             headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         });
+        // const response = await fetch(`https://api.spotify.com/v1/recommendations?seed_genres=${query}&limit=${currentLength}`, {
+        //     method: 'GET',
+        //     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        // });
         if (!response.ok) {
             throw new Error(`Failed to fetch tracks for genre ${element}: ${response.status}`);
+        } else {
+            console.log('Tracks fetched and saved to localStorage');
         }
         const data = await response.json();
         saveTrackData(data.tracks.items.map((track: any) => simplefieGetTrack(track)));
-    }));
-    console.log('Tracks fetched and saved to localStorage');
+    }));  
 };
 
 
@@ -78,17 +88,17 @@ export async function getTracks(genres: Set<string>, length: number, token: stri
  * @example
  * // returns { id: "abc", name: "Song", artists: [...], ... }
  * const track = simplefieGetTrack(rawSpotifyTrackObject);
- * @param {any} track - A raw track object from the Spotify API response.
+ * @param {SpotifyRawTrack} track - A raw track object from the Spotify API response.
  * @precondition track contains the fields: id, name, artists, album, preview_url,
  *              external_urls.spotify, duration_ms, uri.
  * @returns {Track} A simplified Track object with only the relevant fields.
  */
-function simplefieGetTrack(track: any): Track {
+function simplefieGetTrack(track: SpotifyRawTrack): Track {
     return {
         id: track.id,
         name: track.name,
         artists: track.artists.map((artist: any) => ({ id: artist.id, name: artist.name })),
-        album: track.album.name,
+        album: {name: track.album.name, imageUrl: track.album.images[0]?.url || ''},
         previewUrl: track.preview_url,
         externalUrl: track.external_urls.spotify,
         durationMs: track.duration_ms,
@@ -104,13 +114,13 @@ const storedData = {
 } as const;
 
 // Saves the playlist id to localStorage.
-const savePlaylistData = (data: any): void => {
+const savePlaylistData = (data: string): void => {
   localStorage.setItem(storedData.playlist, JSON.stringify(data));
 };
 
  // Appends an array of track data to the existing track array in localStorage.
  // If no existing data is found, starts a new array.
-export const saveTrackData = (data: any): void => {
+export const saveTrackData = (data: Array<Track>): void => {
     const existingData = getStoredTrack() || [];
     const combinedData = existingData.concat(data);
     localStorage.setItem(storedData.track, JSON.stringify(combinedData));
@@ -123,7 +133,7 @@ export const clearTrackData = (): void => {
 };
 
 // Retrieves the stored track data array from localStorage, or null if not found.
-export const getStoredTrack = (): any | null => {
+export const getStoredTrack = (): Array<Track> | null => {
   const trackData = localStorage.getItem(storedData.track);
   if (trackData) {
     return JSON.parse(trackData);
@@ -184,7 +194,7 @@ export async function createPlaylistAddTracks(
       console.error('Error creating playlist:', err);
     });
     const playlistId = getStoredPlaylist();
-    const trackURIs = await getStoredTrack().map((track: Track) => track.uri);
+    const trackURIs = getStoredTrack()!.map((track: Track) => track.uri);
     if (playlistId) {
         addTracksToPlaylist(playlistId, trackURIs, token);
         console.log('Tracks added to playlist:', trackURIs);
@@ -211,83 +221,6 @@ function moodsToGenres(moods: Array<MoodProfile>): Set<string> {
     return genres;
 };
 
-/**
- * Shuffles the stored tracks in localStorage using the Fisher-Yates algorithm.
- * @example
- * // shuffles tracks currently in localStorage
- * shuffleTracks();
- * @precondition Track data exists in localStorage (otherwise returns early).
- * @sideeffect Clears and rewrites the track data in localStorage with the shuffled order.
- * @returns {void}
- */
-function shuffleTracks(): void {
-    const tracks = getStoredTrack();
-    clearTrackData();
-    if (!tracks) return;
-    for (let i = tracks.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [tracks[i], tracks[j]] = [tracks[j], tracks[i]];
-    }
-    saveTrackData(tracks);
-}
 
 
-/**
- * Orchestrates the full track generation pipeline: resolves mood names to mood profiles,
- * extracts genres, fetches tracks from Spotify, and shuffles them.
- * @example
- * main(["chill", "happy"], 20, token);
- * @param {Array<string>} inputMoods - Array of mood name strings to look up.
- * @param {number} inputLength - Total number of tracks to fetch.
- * @param {string} token - Spotify OAuth Bearer token.
- * @precondition inputMoods contains valid mood names recognized by getMoodById.
- *              inputLength is a positive integer. token is a valid Spotify OAuth token.
- * @sideeffect Clears existing track data, fetches new tracks, and saves shuffled results to localStorage.
- * @returns {void}
- */
-export async function main(inputMoods: Array<string>, inputLength: number, token: string): Promise<void> {
-        const moodProfiles = inputMoods
-            .map(moodName => getMoodById(moodName))
-            .filter((mood): mood is MoodProfile => mood !== undefined);// inefficient but works
-        clearTrackData();
-        const genres = moodsToGenres(moodProfiles);
-        await getTracks(genres, inputLength, token);
-        //Todo: filter out excluded genres
-        shuffleTracks();
-}
 
-
-export async function funny(token: string): Promise<void> {
-    let mood = {
-        id: "random1",
-        label: "Random 1",
-        description: "Random mood profile",
-        genres: [] as string[],
-    }
-    for (let i = 0; i <= 16; i++) {
-        mood.genres.push(genresAll[Math.floor(Math.random() * genresAll.length)]);
-    }
-    const genreSet = new Set(mood.genres);
-    clearTrackData();
-    await getTracks(genreSet, 50, token);
-    console.log('Random genres:', mood.genres);
-    //Todo: filter out excluded genres
-    shuffleTracks();
-    const playlistDescription = '' + mood.genres.join(', ');
-    await createPlaylist(token, ('Random Playlist ' + Math.floor(Math.random()*1000)), playlistDescription, true)
-        .then((playlistId) => {
-            console.log('Playlist created with ID:', playlistId);})
-        .catch((err) => {
-            console.error('Error creating playlist:', err);
-        });
-    const playlistId = await getStoredPlaylist();
-    const tracks = await getStoredTrack().map((track: Track) => track.uri);
-    if (playlistId) {
-        addTracksToPlaylist(playlistId, tracks, token);
-        console.log('Tracks added to playlist:', tracks);
-    } else {
-        console.error('No stored playlist ID found');
-    }
-
-    
-}

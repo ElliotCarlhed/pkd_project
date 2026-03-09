@@ -1,10 +1,12 @@
 import { Link } from 'wouter';
 import TinderCard from 'react-tinder-card';
-import { useState } from 'react';
-import type { SVGProps } from 'react';
+import { useState, useEffect as Effect, useRef } from 'react';
+import type { SVGProps} from 'react';
 import {saveTrackData, clearTrackData, getStoredTrack, createPlaylist, createPlaylistAddTracks} from './spotifyApi'
+import { demoPlay, togglePlay } from './playerfunction';
+import { transferPlayback } from './PlayerApi';
 
-// SVG's 
+// SVG's from svgrepo.com
 const RightArrowSVG = (props: SVGProps<SVGSVGElement>) => (
   <svg width="110px" height="110px" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
   <path d="M4 12H6.5M20 12L14 6M20 12L14 18M20 12H9.5" stroke="#2a8036" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -22,71 +24,80 @@ interface PlaylistCreatorProps {
   // add any additional state props here
 }
 
-const songs: Array<Track> = [
-  {
-    id: '1',
-    name: 'Song One',
-    artists: [{ id: 'a1', name: 'Artist One' }],
-    album: {
-      id: 'al1',
-      name: 'Album One',
-      imageUrl:
-        'https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228',
-      releaseDate: '2020-01-01',
-    },
-    previewUrl: null,
-    externalUrl: 'https://open.spotify.com/track/1', 
-    // Check how API returns track URL
-    // Use regEx to transform to desired format. 
-    durationMs: 210000,
-    imageUrl:
-      'https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228',
-    uri: 'hej'
-  },
-  {
-    id: '2',
-    name: 'Song Two',
-    artists: [{ id: 'a2', name: 'Artist Two' }],
-    album: {
-      id: 'al1',
-      name: 'Album One',
-      imageUrl:
-        'https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228',
-      releaseDate: '2020-01-01',
-    },
-    previewUrl: null,
-    externalUrl: 'https://open.spotify.com/track/1',
-    durationMs: 210000,
-    imageUrl:
-      'https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228',
-      uri: 'hej'
-  },
-  {
-    id: '3',
-    name: 'Song Three',
-    artists: [{ id: 'a3', name: 'Artist Three' }],
-    album: {
-      id: 'al1',
-      name: 'Album One',
-      imageUrl:
-        'https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228',
-      releaseDate: '2020-01-01',
-    },
-    previewUrl: null,
-    externalUrl: 'https://open.spotify.com/track/1',
-    durationMs: 210000,
-    imageUrl:
-      'https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228',
-      uri: 'hej'
-  },
-];
 
 export function PlaylistCreator({ accessToken }: PlaylistCreatorProps) {
-  const [Tracks, setTracks] = useState<Array<Track>>(getStoredTrack);
+  const [Tracks, setTracks] = useState<Array<Track>>(getStoredTrack() || []);
   const [LikedTracks, setLikedTracks] = useState<Array<Track>>([]);
   const [DislikedTracks, setDislikedTracks] = useState<Array<Track>>([]);
   const [deckFinished, setDeckFinished] = useState<boolean>(false);
   const [savingPlaylist, setSavingPlaylist] = useState<boolean>(false);
+  const [deviceId, setDeviceId] = useState<string | null>(null);
+  const [status, setStatus] = useState("Loading SDK...");
+  const playerRef = useRef<any>(null);
+  const [track, setTrack] = useState<any>(null);
+  const [isPaused, setIsPaused] = useState(true);
+
+
+  Effect(() => {
+          if (playerRef.current) return; 
+
+          const init = () => {
+              if(!window.Spotify) {
+                  setStatus("SDK not found on window, mabye add script tag?");
+                  return;
+              }
+
+              const player = new window.Spotify.Player({
+                  name: "My Vite Spotify Player",
+                  getOAuthToken: (cb: (t: string) => void) => cb( accessToken! ),
+                  volume: 0.5,
+              });
+
+              playerRef.current = player;
+
+              player.addListener("ready", async ({ device_id }: any) => {
+                  setDeviceId(device_id);
+                  setStatus(`Ready (device ID: ${device_id})`);
+
+                  try {
+                      await transferPlayback(accessToken, device_id);
+                  } catch (e) {
+                      setStatus(e instanceof Error ? e.message : "Transfer playback failed");
+                  }
+              });
+
+              player.addListener("not_ready", ({ device_id }: any) => {
+                  setStatus(`Device offline: ${device_id}`);
+              });
+
+              player.addListener("player_state_changed", (state: any) => {
+                  if (!state) return;
+                      setIsPaused(state.paused);
+                      setTrack(state.track_window?.current_track ?? null);
+              });
+
+              player.connect().then((ok: boolean) => {
+                  if (ok) setStatus("Connecting...");
+                  else setStatus("Failed to connect");
+              });
+          };
+
+          if (window.Spotify) {
+              init();
+          }
+          else { 
+              window.onSpotifyWebPlaybackSDKReady = init;
+          }
+
+      }, [accessToken]);
+
+  
+  Effect(() => {
+      if (Tracks.length === 0 || !deviceId || !accessToken) return;
+      demoPlay(accessToken, Tracks[0].uri, deviceId);
+  }, [Tracks, deviceId, accessToken]);
+
+
 
   const onSwipe = (
     direction: string,
@@ -178,6 +189,7 @@ export function PlaylistCreator({ accessToken }: PlaylistCreatorProps) {
                 (document.querySelector('input') as HTMLInputElement)?.value || 'My Tinder Playlist', 
                 'A playlist generated from the Tinder-like interface', 
                 true);
+              // TODO: Redirect to home page 
             }
           }}>
           {savingPlaylist ? 'Create Playlist' : 'Save Playlist'}
@@ -235,7 +247,21 @@ export function PlaylistCreator({ accessToken }: PlaylistCreatorProps) {
                 onDragStart={(e) => e.preventDefault()}
               />
               <h2>{Tracks[0].name}</h2>
-              <p>{Tracks[0].artists[0].name}</p>
+              <p>{Tracks[0].artists.map((artist) => artist.name).join(', ')}</p>
+              <button 
+                className="btn btn-secondary" 
+                style={{backgroundColor: '#1DB964', color: 'black', margin: '10px'}}
+                onClick={() => demoPlay(accessToken, Tracks[0].uri, deviceId)} 
+                disabled={!deviceId}> 
+                Play song 
+              </button>
+              <button 
+                className="btn btn-secondary" 
+                onClick={() => togglePlay(playerRef)} 
+                disabled={!deviceId}>
+                {isPaused ? "Play" : "Pause"}
+              </button>
+
             </div>
 
             <div 
