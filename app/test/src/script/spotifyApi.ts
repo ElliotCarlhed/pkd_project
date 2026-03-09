@@ -175,6 +175,21 @@ export async function addTracksToPlaylist(playlistId: string, trackUris: string[
     
 };
 
+
+
+/**
+ * Creates a new Spotify playlist and adds all currently stored tracks to it.
+ * @example
+ * await createPlaylistAddTracks(token, "My Playlist", "Generated playlist", true);
+ * @param {string} token - Spotify OAuth Bearer token.
+ * @param {string} playlistName - Name of the playlist to create.
+ * @param {string} description - Description text for the playlist.
+ * @param {boolean} isPublic - Whether the playlist is publicly visible.
+ * @precondition token is valid. Tracks have been fetched and stored via getTracks().
+ * @sideeffect Reads from and modifies localStorage (playlist and track data).
+ * @throws Error if playlist creation or track addition fails.
+ * @returns {Promise<void>}
+ */
 export async function createPlaylistAddTracks(
     token : string, 
     playlistName : string,
