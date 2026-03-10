@@ -41,53 +41,32 @@ export function PlaylistCreator({ accessToken }: PlaylistCreatorProps) {
   Effect(() => {
           if (playerRef.current) return; 
 
-          const init = () => {
-              if(!window.Spotify) {
-                  setStatus("SDK not found on window, mabye add script tag?");
-                  return;
-              }
 
               const player = new window.Spotify.Player({
                   name: "My Vite Spotify Player",
                   getOAuthToken: (cb: (t: string) => void) => cb( accessToken! ),
                   volume: 0.5,
-              });
+              }); 
 
               playerRef.current = player;
-
-              player.addListener("ready", async ({ device_id }: any) => {
+              
+              
+              player.addListener("ready", async ({ device_id }: {device_id: string}) => {
                   setDeviceId(device_id);
-                  setStatus(`Ready (device ID: ${device_id})`);
-
                   try {
                       await transferPlayback(accessToken, device_id);
                   } catch (e) {
-                      setStatus(e instanceof Error ? e.message : "Transfer playback failed");
+                      console.log(e instanceof Error ? e.message : "Transfer playback function failed"); 
                   }
               });
-
-              player.addListener("not_ready", ({ device_id }: any) => {
-                  setStatus(`Device offline: ${device_id}`);
-              });
-
+              // Keeps pause button in sync
               player.addListener("player_state_changed", (state: any) => {
-                  if (!state) return;
+                  if (!state) return; 
                       setIsPaused(state.paused);
-                      setTrack(state.track_window?.current_track ?? null);
               });
 
-              player.connect().then((ok: boolean) => {
-                  if (ok) setStatus("Connecting...");
-                  else setStatus("Failed to connect");
-              });
-          };
-
-          if (window.Spotify) {
-              init();
-          }
-          else { 
-              window.onSpotifyWebPlaybackSDKReady = init;
-          }
+              player.connect()  
+          
 
       }, [accessToken]);
 

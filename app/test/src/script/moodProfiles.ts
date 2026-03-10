@@ -210,7 +210,7 @@ export const moods: MoodProfile[] = [
   }
 ];
 
-// Helper: look up a mood by its id
+
 export function getMoodById(id: string): MoodProfile | undefined {
   return moods.find((m) => m.id === id);
 }

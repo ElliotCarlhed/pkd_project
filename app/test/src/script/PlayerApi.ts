@@ -1,3 +1,10 @@
+/**
+ * Makes spotify play audio from current open browser. 
+ * 
+ * @param deviceId 
+ * A unique ID given for the browser player
+ * 
+ */
 export async function transferPlayback(accessToken: string | null, deviceId: string) {
   const res = await fetch("https://api.spotify.com/v1/me/player", {
     method: "PUT",
