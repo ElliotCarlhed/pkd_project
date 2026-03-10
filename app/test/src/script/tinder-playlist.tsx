@@ -32,9 +32,7 @@ export function PlaylistCreator({ accessToken }: PlaylistCreatorProps) {
   const [deckFinished, setDeckFinished] = useState<boolean>(false);
   const [savingPlaylist, setSavingPlaylist] = useState<boolean>(false);
   const [deviceId, setDeviceId] = useState<string | null>(null);
-  const [status, setStatus] = useState("Loading SDK...");
   const playerRef = useRef<any>(null);
-  const [track, setTrack] = useState<any>(null);
   const [isPaused, setIsPaused] = useState(true);
 
 
@@ -135,6 +133,12 @@ export function PlaylistCreator({ accessToken }: PlaylistCreatorProps) {
             <h1>Deck Finished</h1>
             <p>Liked tracks: {LikedTracks.length}</p>
             <p>Disliked tracks: {DislikedTracks.length}</p>
+            <button
+                className="btn btn-secondary" 
+                onClick={() => togglePlay(playerRef)} 
+                disabled={!deviceId}>
+                {isPaused ? "Paused" : "Press to pause music"}
+            </button>
           </>
         )}
 
