@@ -1,6 +1,6 @@
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import TinderCard from 'react-tinder-card';
-import { useState, useEffect as Effect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { SVGProps} from 'react';
 import {saveTrackData, clearTrackData, getStoredTrack, createPlaylist, createPlaylistAddTracks} from './spotifyApi'
 import { demoPlay, togglePlay } from './playerfunction';
@@ -36,9 +36,10 @@ export function PlaylistCreator({ accessToken }: PlaylistCreatorProps) {
   const playerRef = useRef<any>(null);
   const [track, setTrack] = useState<any>(null);
   const [isPaused, setIsPaused] = useState(true);
+  const [location, setLocation] = useLocation();
 
 
-  Effect(() => {
+ useEffect(() => {
           if (playerRef.current) return; 
 
           const init = () => {
@@ -92,7 +93,7 @@ export function PlaylistCreator({ accessToken }: PlaylistCreatorProps) {
       }, [accessToken]);
 
   
-  Effect(() => {
+ useEffect(() => {
       if (Tracks.length === 0 || !deviceId || !accessToken) return;
       demoPlay(accessToken, Tracks[0].uri, deviceId);
   }, [Tracks, deviceId, accessToken]);
@@ -187,9 +188,10 @@ export function PlaylistCreator({ accessToken }: PlaylistCreatorProps) {
               handleGeneratePlaylist(
                 accessToken!, 
                 (document.querySelector('input') as HTMLInputElement)?.value || 'My Tinder Playlist', 
-                'A playlist generated from the Tinder-like interface', 
+                'A playlist generated from Spotifynder', 
                 true);
-              // TODO: Redirect to home page 
+              setLocation('/callback');
+               
             }
           }}>
           {savingPlaylist ? 'Create Playlist' : 'Save Playlist'}
