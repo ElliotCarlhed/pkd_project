@@ -158,55 +158,6 @@ export const moods: MoodProfile[] = [
     genres: ["acoustic", "folk", "singer-songwriter", "acoustic pop"],
     excludeGenres: ["edm", "electronic", "metal"],
     searchTerms: ["acoustic", "unplugged", "raw", "folk"],
-  },
-  {
-    id: "max",
-    label: "Lång man med skägg",
-    description: "Lång man med skägg",
-    genres: ["death metal", "black metal", "doom metal", "deathcore", "grindcore"],
-    searchTerms: ["max", "everything", "all genres"],
-  },
-  {
-    id: "luleå1",
-    label: "Lule",
-    description: "öl och skägg",
-    genres: ["adult standards", "african percussion", "cowpunk", "finnish hardcore", "ghettotech", "girl group", "intelligent Dance Music", "mathcore", "unblack metal", "oi"],
-    searchTerms: [],
-  },
-    {
-    id: "luleå2",
-    label: "Lule",
-    description: "öl och skägg",
-    genres: ["ska", "classic venezuelan pop", "Caucasian Folk", "Kc Indie"],
-    searchTerms: [],
-  },
-    {
-    id: "luleå3",
-    label: "Lule",
-    description: "öl och skägg",
-    genres: ["Technical Brutal Death Metal", "Industrial", "Tango", "Jazz Orchestra"],
-    searchTerms: [],
-  },
-  {
-    id: "luleå4",
-    label: "Lule",
-    description: "öl och skägg",
-    genres: ["Nu Disco", "Abstractro", "Quebecois", "Garage Punk Blues", "German Show Tunes", "Deep Ccm", "Steelpan", "Martial Industrial"],
-    searchTerms: [],
-  },
-  {
-    id: "random1",
-    label: "Random 1",
-    description: "Random mood profile",
-    genres: ["Fake", "Ragga Jungle", "Martial Industrial", "Yugoslav Rock", "Nintendocore", "Russian Punk"],
-    searchTerms: [],
-  },
-  {
-    id: "kindatoorandom",
-    label: "Random 1",
-    description: "Random mood profile",
-    genres: ["Oshare Kei"],
-    searchTerms: [],
   }
 ];
 
