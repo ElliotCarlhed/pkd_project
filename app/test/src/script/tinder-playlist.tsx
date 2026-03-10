@@ -20,8 +20,7 @@ const LeftArrowSVG = (props: SVGProps<SVGSVGElement>) => (
 )
 
 interface PlaylistCreatorProps {
-  accessToken: string | null; // token from parent
-  // add any additional state props here
+  accessToken: string | null;
 }
 
 
