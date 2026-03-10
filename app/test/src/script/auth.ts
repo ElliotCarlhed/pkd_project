@@ -33,7 +33,7 @@ const getStoredTokenData = (): TokenData | null => {
     expiresAt: parseInt(expiresAt, 10),
   };
 };
-
+//hej
 // clears the stored data in the categries defined in STORAGE_KEYS from localStorage
 export const clearTokenData = (): void => {
   localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
