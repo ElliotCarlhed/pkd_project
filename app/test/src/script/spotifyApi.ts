@@ -78,7 +78,7 @@ export async function getTracks(moods: Array<MoodProfile>, length: number, token
             console.log('Tracks fetched and saved to localStorage');
         }
         const data = await response.json();
-        saveTrackData(data.tracks.items.map((track: any) => simplefieGetTrack(track)));
+        saveTrackData(data.tracks.items.map((track: SpotifyRawTrack) => simplefieGetTrack(track)));
     }));  
 };
 
@@ -97,7 +97,7 @@ function simplefieGetTrack(track: SpotifyRawTrack): Track {
     return {
         id: track.id,
         name: track.name,
-        artists: track.artists.map((artist: any) => ({ id: artist.id, name: artist.name })),
+        artists: track.artists.map((artist: { id: string; name: string }) => ({ id: artist.id, name: artist.name })),
         album: {name: track.album.name, imageUrl: track.album.images[0]?.url || ''},
         previewUrl: track.preview_url,
         externalUrl: track.external_urls.spotify,

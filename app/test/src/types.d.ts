@@ -16,17 +16,17 @@ interface MoodProfile {
   seedArtists?: string[];
 }
 
-// Förenklad representation av en Spotify-låt
+
 interface Track {
   id: string;
   name: string;
   artists: Artist[];
   album: Album;
   previewUrl: string | null;
-  externalUrl: string;       // Länk till Spotify
+  externalUrl: string; 
   durationMs: number;
   imageUrl: string;
-  uri: string;               // Spotify URI, används för att lägga till i spellista
+  uri: string;
 }
 
 interface Artist {
@@ -39,23 +39,23 @@ interface Album {
   imageUrl: string;
 }
 
-// Swipe-session: håller koll på pågående session
+
 interface SwipeSession {
   id: string;
   selectedMoods: MoodProfile[];
-  tracks: Track[];              // Alla hämtade låtar
-  currentIndex: number;         // Vilken låt som visas nu
-  accepted: Track[];            // Låtar som svepats höger
-  rejected: Track[];            // Låtar som svepats vänster
+  tracks: Track[];
+  currentIndex: number;
+  accepted: Track[];
+  rejected: Track[];
   createdAt: Date;
 }
 
-// Resultat som ska bli en spellista
+
 interface PlaylistResult {
   name: string;
   description: string;
   tracks: Track[];
-  spotifyPlaylistId?: string;   // Sätts efter att spellistan skapats
+  spotifyPlaylistId?: string;
   spotifyUrl?: string;
 }
 
@@ -69,8 +69,8 @@ interface UserProfile {
   id: string;
 }
 interface TokenData {
-  accessToken: string;       // Nyckeln som ger oss tillgång till API:t
-  expiresAt: number;         // Tidsstämpel (ms) för när accessToken slutar gälla
+  accessToken: string;
+  expiresAt: number;
 }
 
 interface SpotifyRawTrack {
